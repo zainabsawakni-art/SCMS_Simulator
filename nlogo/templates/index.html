@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏦 Credit Insurance & Rating System Simulation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --secondary-color: #8b5cf6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #06b6d4;
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            padding: 2rem 0;
+            box-shadow: var(--shadow-lg);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .dashboard-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .dashboard-title h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .dashboard-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95rem;
+            font-weight: 400;
+        }
+
+        .main-container {
+            display: flex;
+            gap: 2rem;
+            max-width: 1600px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .sidebar {
+            flex: 0 0 320px;
+            position: sticky;
+            top: 120px;
+            height: fit-content;
+        }
+
+        .main-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .control-panel {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .control-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .control-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--text-secondary);
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.running {
+            background: var(--success-color);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            padding: 0.875rem 1.25rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow);
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #2563eb 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger-color) 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+            color: white;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .metric-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .metric-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-change {
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .metric-change.positive {
+            color: var(--success-color);
+        }
+
+        .metric-change.negative {
+            color: var(--danger-color);
+        }
+
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-card {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .chart-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .parameters-section {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .parameters-header {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .parameters-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .parameters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .parameter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .parameter-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .parameter-value {
+            color: var(--info-color);
+            font-weight: 600;
+        }
+
+        .parameter-input {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--dark-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+
+        .parameter-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border-color);
+            transition: 0.4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--success-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+
+        .rating-distribution {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .rating-badge {
+            flex: 1;
+            text-align: center;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+        }
+
+        .rating-badge.a {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .rating-badge.b {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .rating-badge.c {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .rating-count {
+            display: block;
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .rating-label {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .collapsed {
+            display: none;
+        }
+        
+        .parameter-expander {
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+        
+        .parameter-expander:last-child {
+            border-bottom: none;
+        }
+        
+        .parameter-expander .parameters-header {
+            padding: 0.5rem 0;
+            margin-bottom: 0;
+        }
+        
+        .parameter-expander .parameters-header h3 {
+            margin: 0;
+            color: var(--text-primary);
+        }
+
+        @media (max-width: 1200px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                position: static;
+                flex: 0 0 auto;
+            }
+
+            .button-group {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+
+            .btn {
+                flex: 1;
+                min-width: 140px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-title h1 {
+                font-size: 1.5rem;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+
+            .parameters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="dashboard-header">
+        <div class="header-content">
+            <div class="dashboard-title">
+                <h1>🏦 Credit Insurance & Rating System Simulation</h1>
+            </div>
+            <p class="dashboard-subtitle">
+                Replication of NetLogo CIES 9.1 Model - Advanced Multi-Agent Simulation Platform
+            </p>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Left Sidebar - Controls and Parameters -->
+        <aside class="sidebar">
+            <!-- Control Panel -->
+            <div class="control-panel">
+                <div class="control-header">
+                    <h2><i class="fas fa-gamepad"></i> Controls</h2>
+                </div>
+                <div class="status-indicator" style="margin-bottom: 1rem; justify-content: center;">
+                    <div class="status-dot" id="status-dot"></div>
+                    <span id="status-text">Ready</span>
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-primary" id="setup-btn">
+                        <i class="fas fa-power-off"></i> Setup
+                    </button>
+                    <button class="btn btn-success" id="go-btn" disabled>
+                        <i class="fas fa-play"></i> Go
+                    </button>
+                    <button class="btn btn-danger" id="stop-btn" disabled>
+                        <i class="fas fa-stop"></i> Stop
+                    </button>
+                    <button class="btn btn-secondary" id="step-btn" disabled>
+                        <i class="fas fa-step-forward"></i> Step
+                    </button>
+                    <button class="btn btn-secondary" id="step10-btn" disabled>
+                        <i class="fas fa-forward"></i> Run 10
+                    </button>
+                    <button class="btn btn-secondary" id="step50-btn" disabled>
+                        <i class="fas fa-fast-forward"></i> Run 50
+                    </button>
+                </div>
+            </div>
+
+            <!-- Parameters in Sidebar -->
+            <div class="parameters-section">
+                <div class="parameters-header">
+                    <h2 style="font-size: 1rem;"><i class="fas fa-sliders-h"></i> Parameters</h2>
+                </div>
+                
+                <!-- Basic Parameters -->
+                <div class="parameter-expander">
+                    <div class="parameters-header" onclick="toggleSection('basic-params')" style="cursor: pointer; margin-bottom: 0.5rem;">
+                        <h3 style="font-size: 0.9rem; font-weight: 600;">Basic Parameters</h3>
+                        <i class="fas fa-chevron-down" id="basic-params-icon"></i>
+                    </div>
+                    <div id="basic-params" class="parameters-grid" style="grid-template-columns: 1fr;">
+                        <div class="parameter-group">
+                            <label class="parameter-label" style="font-size: 0.8rem;">
+                                world-size
+                                <span class="parameter-value" id="world-size-display">1225</span>
+                            </label>
+                            <input type="range" class="parameter-input" id="world-size" value="1225" min="100" max="5000" step="25" 
+                                   oninput="document.getElementById('world-size-display').textContent = this.value">
+                        </div>
+                        <div class="parameter-group">
+                            <label class="parameter-label" style="font-size: 0.8rem;">
+                                base-rate (%)
+                                <span class="parameter-value" id="base-rate-display">0.2</span>
+                            </label>
+                            <input type="range" class="parameter-input" id="base-rate" value="0.2" min="0" max="0.5" step="0.01" 
+                                   oninput="document.getElementById('base-rate-display').textContent = parseFloat(this.value).toFixed(2)">
+                        </div>
+                        <div class="parameter-group">
+                            <label class="parameter-label" style="font-size: 0.8rem;">
+                                premium-increment (%)
+                                <span class="parameter-value" id="premium-increment-display">0.1</span>
+                            </label>
+                            <input type="range" class="parameter-input" id="premium-increment" value="0.1" min="0" max="0.15" step="0.05" 
+                                   oninput="document.getElementById('premium-increment-display').textContent = parseFloat(this.value).toFixed(2)">
+                        </div>
+                        <div class="parameter-group">
+                            <label class="parameter-label" style="font-size: 0.8rem;">
+                                max-day
+                                <span class="parameter-value" id="max-day-display">25</span>
+                            </label>
+                            <input type="range" class="parameter-input" id="max-day" value="25" min="5" max="30" step="1" 
+                                   oninput="document.getElementById('max-day-display').textContent = this.value">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loan Parameters -->
+                <div class="parameter-expander">
+                    <div class="parameters-header" onclick="toggleSection('loan-params')" style="cursor: pointer; margin-bottom: 0.5rem;">
+                        <h3 style="font-size: 0.9rem; font-weight: 600;">💰 Loan Parameters</h3>
+                        <i class="fas fa-chevron-right" id="loan-params-icon"></i>
+                    </div>
+                    <div id="loan-params" class="parameters-grid collapsed" style="grid-template-columns: 1fr;">
+                        <div class="parameter-group">
+                            <label class="parameter-label" style="font-size: 0.8rem;">
+                                min-installment ($)
+                                <span class="parameter-value" id="min-installment-display">4200</span>
+                            </label>
+                            <input type="range" class="parameter-input" id="min-installment" value="4200" min="0" max="10000" step="100" 
+                                   oninput="document.getElementById('min-installment-display').textContent = this.value">
+                        </div>
+                        <div class="parameter-group">
+                            <label class="parameter-label" style="font-size: 0.8rem;">
+                                max-installment ($)
+                                <span class="parameter-value" id="max-installment-display">5400</span>
+                            </label>
+                            <input type="range" class="parameter-input" id="max-installment" value="5400" min="500" max="10000" step="100" 
+                                   oninput="document.getElementById('max-installment-display').textContent = this.value">
+                        </div>
+                        <div class="parameter-group">
+                            <label class="parameter-label" style="font-size: 0.8rem;">
+                                min-periods
+                                <span class="parameter-value" id="min-periods-display">20</span>
+                            </label>
+                            <input type="range" class="parameter-input" id="min-periods" value="20" min="12" max="60" step="1" 
+                                   oninput="document.getElementById('min-periods-display').textContent = this.value">
+                        </div>
+                        <div class="parameter-group">
+                            <label class="parameter-label" style="font-size: 0.8rem;">
+                                max-periods
+                                <span class="parameter-value" id="max-periods-display">60</span>
+                            </label>
+                            <input type="range" class="parameter-input" id="max-periods" value="60" min="12" max="90" step="1" 
+                                   oninput="document.getElementById('max-periods-display').textContent = this.value">
+                        </div>
+                        <div class="parameter-group">
+                            <label class="parameter-label" style="font-size: 0.8rem;">
+                                No-of-periods
+                                <span class="parameter-value" id="no-of-periods-display">90</span>
+                            </label>
+                            <input type="range" class="parameter-input" id="no-of-periods" value="90" min="0" max="1000" step="10" 
+                                   oninput="document.getElementById('no-of-periods-display').textContent = this.value">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Risk Parameters -->
+                <div class="parameter-expander">
+                    <div class="parameters-header" onclick="toggleSection('risk-params')" style="cursor: pointer; margin-bottom: 0.5rem;">
+                        <h3 style="font-size: 0.9rem; font-weight: 600;">Risk Parameters</h3>
+                        <i class="fas fa-chevron-right" id="risk-params-icon"></i>
+                    </div>
+                    <div id="risk-params" class="parameters-grid collapsed" style="grid-template-columns: 1fr;">
+                        <div class="parameter-group">
+                            <label class="parameter-label" style="font-size: 0.8rem;">
+                                insolvency-risk (%)
+                                <span class="parameter-value" id="insolvency-risk-display">3.0</span>
+                            </label>
+                            <input type="range" class="parameter-input" id="insolvency-risk" value="3.0" min="0" max="25" step="0.5" 
+                                   oninput="document.getElementById('insolvency-risk-display').textContent = parseFloat(this.value).toFixed(1)">
+                        </div>
+                        <div class="parameter-group">
+                            <label class="parameter-label" style="font-size: 0.8rem;">
+                                unpaid-fraction (%)
+                                <span class="parameter-value" id="unpaid-fraction-display">70</span>
+                            </label>
+                            <input type="range" class="parameter-input" id="unpaid-fraction" value="70" min="50" max="100" step="1" 
+                                   oninput="document.getElementById('unpaid-fraction-display').textContent = this.value">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Incentive Parameters -->
+                <div class="parameter-expander">
+                    <div class="parameters-header" onclick="toggleSection('incentive-params')" style="cursor: pointer; margin-bottom: 0.5rem;">
+                        <h3 style="font-size: 0.9rem; font-weight: 600;">Incentive Parameters</h3>
+                        <i class="fas fa-chevron-right" id="incentive-params-icon"></i>
+                    </div>
+                    <div id="incentive-params" class="parameters-grid collapsed" style="grid-template-columns: 1fr;">
+                        <div class="parameter-group">
+                            <label class="parameter-label" style="font-size: 0.8rem;">
+                                peer-effect (%)
+                                <span class="parameter-value" id="peer-effect-display">40</span>
+                            </label>
+                            <input type="range" class="parameter-input" id="peer-effect" value="40" min="0" max="100" step="1" 
+                                   oninput="document.getElementById('peer-effect-display').textContent = this.value">
+                        </div>
+                        <div class="parameter-group">
+                            <label class="parameter-label" style="font-size: 0.8rem;">
+                                p-day-response
+                                <span class="parameter-value" id="p-day-response-display">1.0</span>
+                            </label>
+                            <input type="range" class="parameter-input" id="p-day-response" value="1.0" min="0.5" max="1.5" step="0.1" 
+                                   oninput="document.getElementById('p-day-response-display').textContent = parseFloat(this.value).toFixed(1)">
+                        </div>
+                        <div class="parameter-group">
+                            <label class="parameter-label" style="font-size: 0.8rem;">
+                                premium-response
+                                <span class="parameter-value" id="premium-response-display">1.0</span>
+                            </label>
+                            <input type="range" class="parameter-input" id="premium-response" value="1.0" min="0.5" max="1.5" step="0.1" 
+                                   oninput="document.getElementById('premium-response-display').textContent = parseFloat(this.value).toFixed(1)">
+                        </div>
+                        <div class="parameter-group">
+                            <label class="parameter-label" style="font-size: 0.8rem;">
+                                randomness (%)
+                                <span class="parameter-value" id="randomness-display">25</span>
+                            </label>
+                            <input type="range" class="parameter-input" id="randomness" value="25" min="5" max="95" step="1" 
+                                   oninput="document.getElementById('randomness-display').textContent = this.value">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fund Parameters -->
+                <div class="parameter-expander">
+                    <div class="parameters-header" onclick="toggleSection('fund-params')" style="cursor: pointer; margin-bottom: 0.5rem;">
+                        <h3 style="font-size: 0.9rem; font-weight: 600;">Fund Parameters</h3>
+                        <i class="fas fa-chevron-right" id="fund-params-icon"></i>
+                    </div>
+                    <div id="fund-params" class="parameters-grid collapsed" style="grid-template-columns: 1fr;">
+                        <div class="parameter-group">
+                            <label class="parameter-label" style="font-size: 0.8rem;">
+                                reserve-ratio (%)
+                                <span class="parameter-value" id="reserve-ratio-display">0</span>
+                            </label>
+                            <input type="range" class="parameter-input" id="reserve-ratio" value="0" min="0" max="100" step="1" 
+                                   oninput="document.getElementById('reserve-ratio-display').textContent = this.value">
+                        </div>
+                        <div class="parameter-group">
+                            <label class="parameter-label" style="font-size: 0.8rem;">
+                                compensation-ratio (%)
+                                <span class="parameter-value" id="compensation-ratio-display">70</span>
+                            </label>
+                            <input type="range" class="parameter-input" id="compensation-ratio" value="70" min="0" max="100" step="5" 
+                                   oninput="document.getElementById('compensation-ratio-display').textContent = this.value">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Options & Switches -->
+                <div class="parameter-expander">
+                    <div class="parameters-header" onclick="toggleSection('options-params')" style="cursor: pointer; margin-bottom: 0.5rem;">
+                        <h3 style="font-size: 0.9rem; font-weight: 600;">Options & Switches</h3>
+                        <i class="fas fa-chevron-right" id="options-params-icon"></i>
+                    </div>
+                    <div id="options-params" class="parameters-grid collapsed" style="grid-template-columns: 1fr;">
+                        <div class="parameter-group">
+                            <label class="parameter-label" style="font-size: 0.8rem;">
+                                adjust-compensation
+                            </label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="adjust-compensation" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="parameter-group">
+                            <label class="parameter-label" style="font-size: 0.8rem;">
+                                fix-random-seed
+                            </label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="fix-random-seed" onchange="toggleSeedInput()">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="parameter-group" id="seed-input-group" style="display: none;">
+                            <label class="parameter-label" style="font-size: 0.8rem;">
+                                Seed number
+                            </label>
+                            <input type="number" class="parameter-input" id="seed-number" placeholder="Enter seed number">
+                        </div>
+                        <div class="parameter-group">
+                            <label class="parameter-label" style="font-size: 0.8rem;">
+                                renew-financing
+                            </label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="renew-financing" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="parameter-group">
+                            <label class="parameter-label" style="font-size: 0.8rem;">
+                                incentive-system
+                            </label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="incentive-system" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+        <!-- Key Metrics Dashboard -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div>
+                        <div class="metric-label">Month</div>
+                        <div class="metric-value" id="metric-month">0</div>
+                    </div>
+                    <div class="metric-icon" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div>
+                        <div class="metric-label">Active Customers</div>
+                        <div class="metric-value" id="metric-active">0</div>
+                        <div class="metric-change"><span id="metric-total">of 0</span></div>
+                    </div>
+                    <div class="metric-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div>
+                        <div class="metric-label">Fund Assets</div>
+                        <div class="metric-value" id="metric-fund">$0</div>
+                        <div class="metric-change"><span id="metric-fund-net">Net: $0</span></div>
+                    </div>
+                    <div class="metric-icon" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">
+                        <i class="fas fa-piggy-bank"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div>
+                        <div class="metric-label">Bank Assets</div>
+                        <div class="metric-value" id="metric-bank">$0</div>
+                        <div class="metric-change"><span id="metric-bank-cash">Cash: $0</span></div>
+                    </div>
+                    <div class="metric-icon" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);">
+                        <i class="fas fa-university"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div>
+                        <div class="metric-label">Total Deficit</div>
+                        <div class="metric-value" id="metric-deficit">$0</div>
+                        <div class="metric-change"><span id="metric-deficit-cum">Cumulative: $0</span></div>
+                    </div>
+                    <div class="metric-icon" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div>
+                        <div class="metric-label">Compensation</div>
+                        <div class="metric-value" id="metric-compensation">$0</div>
+                        <div class="metric-change"><span id="metric-insolvent">Insolvent: 0</span></div>
+                    </div>
+                    <div class="metric-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                        <i class="fas fa-hand-holding-usd"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Credit Ratings Distribution -->
+        <div class="parameters-section">
+            <div class="parameters-header">
+                <h2><i class="fas fa-star"></i> Credit Ratings Distribution</h2>
+            </div>
+            <div class="rating-distribution">
+                <div class="rating-badge a">
+                    <span class="rating-count" id="rating-a">0</span>
+                    <span class="rating-label">Grade A (1-10 days)</span>
+                </div>
+                <div class="rating-badge b">
+                    <span class="rating-count" id="rating-b">0</span>
+                    <span class="rating-label">Grade B (11-19 days)</span>
+                </div>
+                <div class="rating-badge c">
+                    <span class="rating-count" id="rating-c">0</span>
+                    <span class="rating-label">Grade C (20+ days)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-container">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3><i class="fas fa-chart-line"></i> Financial Performance</h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="financialChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3><i class="fas fa-chart-area"></i> Customer Metrics</h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="customerChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3><i class="fas fa-chart-bar"></i> Debt Analysis</h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="debtChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3><i class="fas fa-chart-pie"></i> Rating Distribution Over Time</h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="ratingChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        </main>
+    </div>
+
+    <script>
+        // Global state
+        let charts = {};
+        let simulationData = {
+            months: [],
+            fundAssets: [],
+            bankAssets: [],
+            activeCustomers: [],
+            deficit: [],
+            compensation: [],
+            performingDebt: [],
+            nonPerformingDebt: [],
+            ratingA: [],
+            ratingB: [],
+            ratingC: []
+        };
+
+        // Initialize charts
+        function initCharts() {
+            const commonOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#f1f5f9'
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        grid: {
+                            color: '#334155'
+                        },
+                        ticks: {
+                            color: '#94a3b8'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: '#334155'
+                        },
+                        ticks: {
+                            color: '#94a3b8'
+                        }
+                    }
+                }
+            };
+
+            // Financial Performance Chart
+            charts.financial = new Chart(document.getElementById('financialChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: simulationData.months,
+                    datasets: [
+                        {
+                            label: 'Fund Assets',
+                            data: simulationData.fundAssets,
+                            borderColor: '#8b5cf6',
+                            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Bank Assets',
+                            data: simulationData.bankAssets,
+                            borderColor: '#06b6d4',
+                            backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: commonOptions
+            });
+
+            // Customer Metrics Chart
+            charts.customer = new Chart(document.getElementById('customerChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: simulationData.months,
+                    datasets: [
+                        {
+                            label: 'Active Customers',
+                            data: simulationData.activeCustomers,
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }
+                    ]
+                },
+                options: commonOptions
+            });
+
+            // Debt Analysis Chart
+            charts.debt = new Chart(document.getElementById('debtChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: simulationData.months,
+                    datasets: [
+                        {
+                            label: 'Performing Debt',
+                            data: simulationData.performingDebt,
+                            backgroundColor: '#10b981'
+                        },
+                        {
+                            label: 'Non-Performing Debt',
+                            data: simulationData.nonPerformingDebt,
+                            backgroundColor: '#ef4444'
+                        }
+                    ]
+                },
+                options: {
+                    ...commonOptions,
+                    scales: {
+                        ...commonOptions.scales,
+                        x: {
+                            ...commonOptions.scales.x,
+                            stacked: true
+                        },
+                        y: {
+                            ...commonOptions.scales.y,
+                            stacked: true
+                        }
+                    }
+                }
+            });
+
+            // Rating Distribution Chart
+            charts.rating = new Chart(document.getElementById('ratingChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: simulationData.months,
+                    datasets: [
+                        {
+                            label: 'Rating A',
+                            data: simulationData.ratingA,
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                            fill: true
+                        },
+                        {
+                            label: 'Rating B',
+                            data: simulationData.ratingB,
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.2)',
+                            fill: true
+                        },
+                        {
+                            label: 'Rating C',
+                            data: simulationData.ratingC,
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                            fill: true
+                        }
+                    ]
+                },
+                options: commonOptions
+            });
+        }
+
+        // Update charts with new data
+        function updateCharts() {
+            Object.values(charts).forEach(chart => chart.update('none'));
+        }
+
+        // Format currency
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(value);
+        }
+
+        // Format number
+        function formatNumber(value) {
+            return new Intl.NumberFormat('en-US').format(value);
+        }
+
+        // Update metrics display
+        function updateMetrics(state) {
+            document.getElementById('metric-month').textContent = state.month;
+            document.getElementById('metric-active').textContent = formatNumber(state.customers.active);
+            document.getElementById('metric-total').textContent = `of ${formatNumber(state.customers.total)}`;
+            document.getElementById('metric-fund').textContent = formatCurrency(state.fund.assets);
+            document.getElementById('metric-fund-net').textContent = `Net: ${formatCurrency(state.fund.net_assets)}`;
+            document.getElementById('metric-bank').textContent = formatCurrency(state.bank.assets);
+            document.getElementById('metric-bank-cash').textContent = `Cash: ${formatCurrency(state.bank.cash)}`;
+            document.getElementById('metric-deficit').textContent = formatCurrency(state.totals.deficit);
+            document.getElementById('metric-deficit-cum').textContent = `Cumulative: ${formatCurrency(state.totals.cum_deficit)}`;
+            document.getElementById('metric-compensation').textContent = formatCurrency(state.totals.compensation);
+            document.getElementById('metric-insolvent').textContent = `Insolvent: ${state.customers.insolvent}`;
+
+            // Update ratings
+            document.getElementById('rating-a').textContent = formatNumber(state.customers.a_rated);
+            document.getElementById('rating-b').textContent = formatNumber(state.customers.b_rated);
+            document.getElementById('rating-c').textContent = formatNumber(state.customers.c_rated);
+
+            // Update chart data
+            if (simulationData.months.length === 0 || simulationData.months[simulationData.months.length - 1] !== state.month) {
+                simulationData.months.push(state.month);
+                simulationData.fundAssets.push(state.fund.assets);
+                simulationData.bankAssets.push(state.bank.assets);
+                simulationData.activeCustomers.push(state.customers.active);
+                simulationData.deficit.push(state.totals.deficit);
+                simulationData.compensation.push(state.totals.compensation);
+                simulationData.performingDebt.push(state.metrics.performing_debt);
+                simulationData.nonPerformingDebt.push(state.metrics.non_performing_debt);
+                simulationData.ratingA.push(state.customers.a_rated);
+                simulationData.ratingB.push(state.customers.b_rated);
+                simulationData.ratingC.push(state.customers.c_rated);
+
+                // Keep only last 100 data points for performance
+                if (simulationData.months.length > 100) {
+                    Object.keys(simulationData).forEach(key => {
+                        simulationData[key].shift();
+                    });
+                }
+
+                updateCharts();
+            }
+        }
+
+        // Clear chart data
+        function clearChartData() {
+            simulationData = {
+                months: [],
+                fundAssets: [],
+                bankAssets: [],
+                activeCustomers: [],
+                deficit: [],
+                compensation: [],
+                performingDebt: [],
+                nonPerformingDebt: [],
+                ratingA: [],
+                ratingB: [],
+                ratingC: []
+            };
+            Object.values(charts).forEach(chart => {
+                chart.data.labels = [];
+                chart.data.datasets.forEach(dataset => {
+                    dataset.data = [];
+                });
+                chart.update();
+            });
+        }
+
+        // Get parameters from form
+        function getParameters() {
+            const params = {
+                world_size: parseInt(document.getElementById('world-size').value),
+                base_rate: parseFloat(document.getElementById('base-rate').value),
+                premium_increment: parseFloat(document.getElementById('premium-increment').value),
+                min_installment: parseFloat(document.getElementById('min-installment').value),
+                max_installment: parseFloat(document.getElementById('max-installment').value),
+                min_periods: parseInt(document.getElementById('min-periods').value),
+                max_periods: parseInt(document.getElementById('max-periods').value),
+                no_of_periods: parseInt(document.getElementById('no-of-periods').value),
+                insolvency_risk: parseFloat(document.getElementById('insolvency-risk').value),
+                unpaid_fraction: parseFloat(document.getElementById('unpaid-fraction').value),
+                max_day: parseInt(document.getElementById('max-day').value),
+                p_day_response: parseFloat(document.getElementById('p-day-response').value),
+                premium_response: parseFloat(document.getElementById('premium-response').value),
+                peer_effect: parseFloat(document.getElementById('peer-effect').value),
+                reserve_ratio: parseFloat(document.getElementById('reserve-ratio').value),
+                compensation_ratio: parseFloat(document.getElementById('compensation-ratio').value),
+                randomness: parseFloat(document.getElementById('randomness').value),
+                renew_financing: document.getElementById('renew-financing').checked,
+                incentive_system: document.getElementById('incentive-system').checked,
+                adjust_compensation: document.getElementById('adjust-compensation').checked,
+                fix_random_seed: document.getElementById('fix-random-seed').checked
+            };
+            
+            // Add seed number if fix_random_seed is enabled
+            if (params.fix_random_seed) {
+                const seedInput = document.getElementById('seed-number').value;
+                if (seedInput) {
+                    params.seed_number = parseInt(seedInput);
+                }
+            }
+            
+            return params;
+        }
+        
+        // Toggle seed input visibility
+        function toggleSeedInput() {
+            const seedGroup = document.getElementById('seed-input-group');
+            const fixSeed = document.getElementById('fix-random-seed').checked;
+            seedGroup.style.display = fixSeed ? 'block' : 'none';
+        }
+
+        // Update status
+        function updateStatus(text, isRunning = false) {
+            document.getElementById('status-text').textContent = text;
+            const dot = document.getElementById('status-dot');
+            if (isRunning) {
+                dot.classList.add('running');
+            } else {
+                dot.classList.remove('running');
+            }
+        }
+
+        // Setup simulation
+        async function setupSimulation() {
+            try {
+                clearChartData();
+                updateStatus('Setting up...');
+                const params = getParameters();
+                
+                const response = await fetch('/api/setup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(params)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateMetrics(data.state);
+                    updateStatus('Ready');
+                    document.getElementById('go-btn').disabled = false;
+                    document.getElementById('step-btn').disabled = false;
+                    document.getElementById('step10-btn').disabled = false;
+                    document.getElementById('step50-btn').disabled = false;
+                } else {
+                    updateStatus('Error: ' + data.message);
+                    alert('Setup failed: ' + data.message);
+                }
+            } catch (error) {
+                updateStatus('Error');
+                alert('Setup failed: ' + error.message);
+            }
+        }
+
+        // Start continuous simulation
+        async function startSimulation() {
+            try {
+                // Check if simulation is initialized
+                const stateResponse = await fetch('/api/state');
+                const stateData = await stateResponse.json();
+                
+                if (!stateData.success) {
+                    alert('Please setup the simulation first!');
+                    return;
+                }
+                
+                const response = await fetch('/api/go', { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateStatus('Running...', true);
+                    document.getElementById('go-btn').disabled = true;
+                    document.getElementById('stop-btn').disabled = false;
+                    document.getElementById('step-btn').disabled = true;
+                    document.getElementById('step10-btn').disabled = true;
+                    document.getElementById('step50-btn').disabled = true;
+                    document.getElementById('setup-btn').disabled = true;
+                    
+                    // Start polling for updates
+                    pollSimulation();
+                } else {
+                    alert('Failed to start: ' + (data.message || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Start simulation error:', error);
+                updateStatus('Error');
+                alert('Failed to start simulation: ' + error.message);
+            }
+        }
+
+        // Stop simulation
+        async function stopSimulation() {
+            try {
+                stopPolling(); // Stop polling first
+                
+                const response = await fetch('/api/stop', { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateStatus('Stopped', false);
+                    document.getElementById('go-btn').disabled = false;
+                    document.getElementById('stop-btn').disabled = true;
+                    document.getElementById('step-btn').disabled = false;
+                    document.getElementById('step10-btn').disabled = false;
+                    document.getElementById('step50-btn').disabled = false;
+                    document.getElementById('setup-btn').disabled = false;
+                }
+            } catch (error) {
+                console.error('Stop error:', error);
+                alert('Failed to stop simulation: ' + error.message);
+            }
+        }
+
+        // Single step
+        async function stepSimulation() {
+            try {
+                updateStatus('Stepping...');
+                const response = await fetch('/api/step', { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateMetrics(data.state);
+                    updateStatus('Ready');
+                    
+                    if (!data.can_continue) {
+                        updateStatus('Simulation Complete');
+                        document.getElementById('step-btn').disabled = true;
+                        document.getElementById('step10-btn').disabled = true;
+                        document.getElementById('step50-btn').disabled = true;
+                        document.getElementById('go-btn').disabled = true;
+                    }
+                } else {
+                    updateStatus('Error: ' + data.message);
+                }
+            } catch (error) {
+                updateStatus('Error');
+                alert('Step failed: ' + error.message);
+            }
+        }
+
+        // Multiple steps
+        async function stepMultiple(count) {
+            document.getElementById('step-btn').disabled = true;
+            document.getElementById('step10-btn').disabled = true;
+            document.getElementById('step50-btn').disabled = true;
+            document.getElementById('go-btn').disabled = true;
+            
+            updateStatus(`Running ${count} steps...`);
+            
+            for (let i = 0; i < count; i++) {
+                try {
+                    const response = await fetch('/api/step', { method: 'POST' });
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        updateMetrics(data.state);
+                        
+                        if (!data.can_continue) {
+                            updateStatus('Simulation Complete');
+                            return;
+                        }
+                    } else {
+                        updateStatus('Error: ' + data.message);
+                        return;
+                    }
+                } catch (error) {
+                    updateStatus('Error');
+                    alert('Step failed: ' + error.message);
+                    return;
+                }
+                
+                // Small delay to prevent overwhelming the UI
+                await new Promise(resolve => setTimeout(resolve, 50));
+            }
+            
+            updateStatus('Ready');
+            document.getElementById('step-btn').disabled = false;
+            document.getElementById('step10-btn').disabled = false;
+            document.getElementById('step50-btn').disabled = false;
+            document.getElementById('go-btn').disabled = false;
+        }
+
+        // Poll simulation state while running
+        let pollInterval = null;
+        
+        async function pollSimulation() {
+            try {
+                // Check if still running
+                const statusResponse = await fetch('/api/is_running');
+                const statusData = await statusResponse.json();
+                
+                if (!statusData.running) {
+                    // Simulation stopped
+                    stopPolling();
+                    updateStatus('Stopped');
+                    document.getElementById('go-btn').disabled = false;
+                    document.getElementById('stop-btn').disabled = true;
+                    document.getElementById('step-btn').disabled = false;
+                    document.getElementById('step10-btn').disabled = false;
+                    document.getElementById('step50-btn').disabled = false;
+                    document.getElementById('setup-btn').disabled = false;
+                    return;
+                }
+                
+                // Step simulation
+                const stepResponse = await fetch('/api/step', { method: 'POST' });
+                const stepData = await stepResponse.json();
+                
+                if (stepData.success) {
+                    // Update UI with new state
+                    updateMetrics(stepData.state);
+                    
+                    // Check if simulation can continue
+                    if (!stepData.can_continue) {
+                        // Simulation reached max periods
+                        await stopSimulation();
+                        updateStatus('Simulation Complete');
+                        return;
+                    }
+                    
+                    // Continue polling
+                    pollInterval = setTimeout(pollSimulation, 500); // Poll every 500ms
+                } else {
+                    // Error in step
+                    console.error('Step error:', stepData.message);
+                    await stopSimulation();
+                    updateStatus('Error: ' + stepData.message);
+                }
+            } catch (error) {
+                console.error('Poll error:', error);
+                // Continue polling even on error (might be temporary)
+                pollInterval = setTimeout(pollSimulation, 1000);
+            }
+        }
+        
+        function stopPolling() {
+            if (pollInterval) {
+                clearTimeout(pollInterval);
+                pollInterval = null;
+            }
+        }
+
+        // Toggle parameter section
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            const icon = document.getElementById(sectionId + '-icon');
+            
+            if (!section || !icon) return;
+            
+            if (section.classList.contains('collapsed')) {
+                section.classList.remove('collapsed');
+                icon.classList.remove('fa-chevron-right');
+                icon.classList.add('fa-chevron-down');
+            } else {
+                section.classList.add('collapsed');
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-right');
+            }
+        }
+
+        // Update parameter displays
+        function setupParameterDisplays() {
+            const params = [
+                'world-size', 'base-rate', 'premium-increment', 'insolvency-risk', 'peer-effect'
+            ];
+            
+            params.forEach(param => {
+                const input = document.getElementById(param);
+                const display = document.getElementById(param + '-display');
+                
+                if (input && display) {
+                    input.addEventListener('input', () => {
+                        display.textContent = input.value;
+                    });
+                }
+            });
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            setupParameterDisplays();
+            updateStatus('Ready');
+            
+            // Ensure buttons are properly connected
+            const goBtn = document.getElementById('go-btn');
+            if (goBtn) {
+                goBtn.addEventListener('click', startSimulation);
+            }
+            
+            const stopBtn = document.getElementById('stop-btn');
+            if (stopBtn) {
+                stopBtn.addEventListener('click', stopSimulation);
+            }
+            
+            const setupBtn = document.getElementById('setup-btn');
+            if (setupBtn) {
+                setupBtn.addEventListener('click', setupSimulation);
+            }
+            
+            const stepBtn = document.getElementById('step-btn');
+            if (stepBtn) {
+                stepBtn.addEventListener('click', stepSimulation);
+            }
+            
+            console.log('Flask app initialized successfully');
+        });
+    </script>
+</body>
+</html>
