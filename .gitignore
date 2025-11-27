@@ -1,0 +1,99 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Flask stuff
+instance/
+.webassets-cache
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+.streamlit/secrets.toml
+
+# Project specific
+*.zip
+SCMS_Simulator.zip
+upload_to_github.ps1
+create_upload_zip.ps1
+
+# Documentation (keep main README, ignore deployment docs)
+*_SETUP.md
+*_DEPLOYMENT.md
+*_INSTRUCTIONS.md
+*_CHECKLIST.md
+*_FIX.md
+*_MANUAL.md
+TROUBLESHOOT*.md
+DELETE_*.md
+MOVE_*.md
+FIX_*.md
+GITHUB_*.md
+LOCAL_*.md
+QUICK_START_*.md
+RUN_*.md
+CREATE_*.md
+UPLOAD_*.md
+
+# Flask files (not needed for Streamlit Cloud)
+flask_app.py
+wsgi.py
+requirements_flask.txt
+static/
+templates/
